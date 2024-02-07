@@ -1,0 +1,130 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a simple service for managing car",
+        "title": "Car API",
+        "contact": {
+            "name": "API Support",
+            "email": "soberkoder@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/cars": {
+            "get": {
+                "description": "Get list of all car",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cars"
+                ],
+                "summary": "Get list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Car"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Post details of car corresponding to the input Id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cars"
+                ],
+                "summary": "Post details for a given Id",
+                "parameters": [
+                    {
+                        "description": "create car",
+                        "name": "models.Car",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/models.Car"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Car"
+                        }
+                    }
+                }
+            }
+        },
+        "/cars/{carID}": {
+            "get": {
+                "description": "Get details of all car",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cars"
+                ],
+                "summary": "Get details",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID for the car",
+                        "name": "Id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Car"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Car": {
+            "type": "object",
+            "properties": {
+                "brand": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

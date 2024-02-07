@@ -1,0 +1,85 @@
+basePath: /
+definitions:
+  models.Car:
+    properties:
+      brand:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
+      userID:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: soberkoder@swagger.io
+    name: API Support
+  description: This is a simple service for managing car
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/
+  title: Car API
+  version: "1.0"
+paths:
+  /cars:
+    get:
+      consumes:
+      - application/json
+      description: Get list of all car
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Car'
+      summary: Get list
+      tags:
+      - cars
+    post:
+      consumes:
+      - application/json
+      description: Post details of car corresponding to the input Id
+      parameters:
+      - description: create car
+        in: body
+        name: models.Car
+        schema:
+          $ref: '#/definitions/models.Car'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Car'
+      summary: Post details for a given Id
+      tags:
+      - cars
+  /cars/{carID}:
+    get:
+      consumes:
+      - application/json
+      description: Get details of all car
+      parameters:
+      - description: ID for the car
+        in: path
+        name: Id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Car'
+      summary: Get details
+      tags:
+      - cars
+swagger: "2.0"

@@ -1,133 +1,116 @@
 package controllers
 
 import (
+	"bengkel-api/database"
+	"bengkel-api/models"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-type Car struct {
-	CarID string `json:"car_id"`
-	Brand string `json:"brand"`
-	Model string `json:"model"`
-	Price int    `json:"price"`
+// GetCar godoc
+// @Summary Get details
+// @Description Get details of all car
+// @Tags cars
+// @Accept json
+// @Produce json
+// @Param Id path int tru "ID for the car"
+// @Success 200 {object} models.Car
+// @Router /cars/{carID} [get]
+func GetCar(ctx *gin.Context) {
+	carID := ctx.Param("carID")
+	db := database.GetDB()
+
+	car := models.Car{}
+	err := db.First(&car, "id=?", carID).Error
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"error_status":  "Data Not Found",
+			"error_message": fmt.Sprintf("car with id %v not found", carID),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"car": car,
+	})
 }
 
-var CarDatas = []Car{}
+// GetAllCar godoc
+// @Summary Get list
+// @Description Get list of all car
+// @Tags cars
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.Car
+// @Router /cars [get]
+func GetAllCar(ctx *gin.Context) {
+	db := database.GetDB()
 
+	car := models.Car{}
+	err := db.Find(&car).Error
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error_status":  "Failed get data",
+			"error_message": "Something wrong when try to get data",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"car": car,
+	})
+}
+
+// CreateCar godoc
+// @Summary Post details for a given Id
+// @Description Post details of car corresponding to the input Id
+// @Tags cars
+// @Accept json
+// @Produce json
+// @Param models.Car body models.Car true "create car"
+// @Success 200 {object} models.Car
+// @Router /cars [post]
 func CreateCar(ctx *gin.Context) {
-	var newCar Car
+	db := database.GetDB()
+	newCar := models.Car{}
 
 	if err := ctx.ShouldBindJSON(&newCar); err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	newCar.CarID = fmt.Sprintf("c%d", len(CarDatas)+1)
-	CarDatas = append(CarDatas, newCar)
+	fmt.Println(&newCar)
+	err := db.Create(&newCar).Error
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error_status":  "Error insert data",
+			"error_message": "Something wrong when try to insert data",
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"car": newCar,
 	})
 }
 
-func GetCar(ctx *gin.Context) {
-	carID := ctx.Param("carID")
-	condition := false
-	var carData Car
-
-	for i, car := range CarDatas {
-		if carID == car.CarID {
-			condition = true
-			carData = CarDatas[i]
-			break
-		}
-	}
-
-	if !condition {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-			"error_status":  "Data Not Found",
-			"error_message": fmt.Sprintf("car with id %v not found", carID),
-		})
-
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"car": carData,
-	})
-}
-
-func GetAllCar(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"car": CarDatas,
-	})
-}
-
 func UpdateCar(ctx *gin.Context) {
 	carID := ctx.Param("carID")
-	condition := false
+	db := database.GetDB()
 
-	var updateCar Car
-	var carData Car
+	carUpdate := models.Car{}
 
-	if err := ctx.ShouldBindJSON(&updateCar); err != nil {
+	if err := ctx.ShouldBindJSON(&carUpdate); err != nil { // get body request
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	for i, car := range CarDatas {
-		if carID == car.CarID {
-			condition = true
-			CarDatas[i] = updateCar
-			carData = CarDatas[i]
-			break
-		}
-	}
-
-	if !condition {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-			"error_status":  "Data Not Found",
-			"error_message": fmt.Sprintf("car with id %v not found", carID),
-		})
-
-		return
-	}
-
+	err := db.Model(&)
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": fmt.Sprintf("car with id %v has been successfully updated", carID),
-		"car":     carData,
+		"car": "success",
 	})
-}
 
-func DeleteCar(ctx *gin.Context) {
-	carID := ctx.Param("carID")
-	condition := false
-	var carIndex int
-
-	for i, car := range CarDatas {
-		if carID == car.CarID {
-			condition = true
-			carIndex = i
-			break
-		}
-	}
-
-	if !condition {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-			"error_status":  "Data Not Found",
-			"error_message": fmt.Sprintf("car with id %v not found", carID),
-		})
-
-		return
-	}
-
-	copy(CarDatas[carIndex:], CarDatas[carIndex+1:])
-	CarDatas[len(CarDatas)-1] = Car{}
-	carDatas = CarDatas[:len(CarDatas)-1]
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": fmt.Sprintf("car with id %v has been successfully deleted", carID),
-	})
 }
